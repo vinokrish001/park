@@ -1,0 +1,25 @@
+.page { padding: 24px; }
+.page-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+.page-head h2 { margin: 0; }
+.sub, .muted { color: #6b7280; font-size: 13px; margin: 4px 0 0; }
+.card { background: #fff; border-radius: 12px; padding: 12px; }
+.toolbar { display: flex; justify-content: space-between; gap: 12px; padding: 8px; }
+.search input { width: 280px; padding-left: 32px; }
+.toolbar-right { display: flex; gap: 8px; align-items: center; }
+.emp { display: flex; align-items: center; gap: 10px; }
+.name { font-weight: 600; }
+.mail { color: #6b7280; font-size: 12px; }
+.avatar {
+  width: 32px; height: 32px; border-radius: 50%; background: #e8eefc; color: #2f80ed;
+  display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600;
+}
+.avatar.lg { width: 44px; height: 44px; font-size: 14px; }
+.badge {
+  background: #e8f8ee; color: #16803c; border-radius: 999px; padding: 4px 10px; font-size: 12px;
+}
+.badge.leave { background: #fff4e5; color: #c2410c; }
+.w100 { width: 100%; display: block; }
+label { display: block; margin: 12px 0 4px; font-size: 13px; font-weight: 600; }
+.photo-row { display: flex; align-items: center; gap: 12px; margin: 12px 0 8px; }
+.photo-row button { margin-left: auto; }
+p-dropdown, p-calendar { width: 100%; display: block; }

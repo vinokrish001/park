@@ -1,0 +1,102 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="page">
+  <div class="page-head">
+    <div>
+      <h2>Employees</h2>
+      <p class="sub">Manage employee details, roles, and account access.</p>
+    </div>
+    <button pButton type="button" label="Add employee" icon="pi pi-plus" (click)="openAdd()"></button>
+  </div>
+
+  <div class="card">
+    <div class="toolbar">
+      <span class="p-input-icon-left search">
+        <i class="pi pi-search"></i>
+        <input pInputText [(ngModel)]="search" (ngModelChange)="onSearch()" placeholder="Search by name, email, or role" />
+      </span>
+      <div class="toolbar-right">
+        <p-dropdown [options]="departments" [(ngModel)]="department" optionLabel="label" optionValue="value" (onChange)="onSearch()"></p-dropdown>
+        <button pButton type="button" label="Export" icon="pi pi-upload" class="p-button-outlined p-button-secondary" (click)="exportCsv()"></button>
+      </div>
+    </div>
+
+    <p-table [value]="list" [lazy]="true" [paginator]="true" [rows]="limit" [totalRecords]="total"
+      [first]="(page - 1) * limit" (onPage)="onPage($event)" [rowsPerPageOptions]="[6,10,20]">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>EMPLOYEE</th>
+          <th>ROLE</th>
+          <th>DEPARTMENT</th>
+          <th>STATUS</th>
+          <th>START DATE</th>
+          <th>ACTIONS</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-row>
+        <tr>
+          <td>
+            <div class="emp">
+              <span class="avatar">{{ initials(row.full_name) }}</span>
+              <div>
+                <div class="name">{{ row.full_name }}</div>
+                <div class="mail">{{ row.email }}</div>
+              </div>
+            </div>
+          </td>
+          <td>{{ row.role }}</td>
+          <td>{{ row.department }}</td>
+          <td>
+            <span class="badge" [class.leave]="row.status === 'On leave'">{{ row.status }}</span>
+          </td>
+          <td>{{ row.start_date | date:'dd MMM, yyyy' }}</td>
+          <td>
+            <button pButton type="button" icon="pi pi-pencil" class="p-button-text p-button-secondary" (click)="openEdit(row)"></button>
+            <button pButton type="button" icon="pi pi-trash" class="p-button-text p-button-danger" (click)="remove(row)"></button>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+
+<p-dialog [(visible)]="showForm" [modal]="true" [style]="{width:'480px'}" [header]="isEdit ? 'Edit employee' : 'Add employee'">
+  <p class="sub">{{ isEdit ? 'Update employee details and workspace access.' : 'Create a new employee profile and invite them to the workspace.' }}</p>
+
+  <div class="photo-row">
+    <span class="avatar lg">{{ initials(form.full_name || 'JD') }}</span>
+    <div>
+      <b>Profile photo</b>
+      <div class="mail">Upload a photo or use initials.</div>
+    </div>
+    <button pButton type="button" label="Upload" class="p-button-outlined" disabled></button>
+  </div>
+
+  <label>Full name</label>
+  <input pInputText [(ngModel)]="form.full_name" class="w100" />
+
+  <label>Email</label>
+  <input pInputText [(ngModel)]="form.email" class="w100" />
+
+  <label>Role</label>
+  <p-dropdown [options]="roles" [(ngModel)]="form.role" placeholder="Select role" styleClass="w100"></p-dropdown>
+
+  <label>Department</label>
+  <p-dropdown [options]="departments.slice(1)" optionLabel="label" optionValue="value" [(ngModel)]="form.department" placeholder="Select department" styleClass="w100"></p-dropdown>
+
+  <label>Manager</label>
+  <p-dropdown [options]="managers" [(ngModel)]="form.manager" placeholder="Select manager" [showClear]="true" styleClass="w100"></p-dropdown>
+
+  <label>Start date</label>
+  <p-calendar [(ngModel)]="startDate" dateFormat="dd M, yy" [showIcon]="true" styleClass="w100"></p-calendar>
+
+  <label>Status</label>
+  <p-dropdown [options]="statuses" [(ngModel)]="form.status" styleClass="w100"></p-dropdown>
+
+  <ng-template pTemplate="footer">
+    <small *ngIf="isEdit" class="muted">Changes will be applied immediately.</small>
+    <button pButton type="button" label="Cancel" class="p-button-text" (click)="showForm = false"></button>
+    <button pButton type="button" [label]="isEdit ? 'Save changes' : 'Add employee'" (click)="save()"></button>
+  </ng-template>
+</p-dialog>
