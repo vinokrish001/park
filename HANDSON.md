@@ -1,10 +1,171 @@
 # Employee Management — type this on client laptop
 
-Use **Angular 22 + CLI** there. Generate files with `ng`. Then type the code into those files.
+Use **Angular 17 + CLI**. Generate files with `ng`. Then type the code into those files.
 
 Run API on **3000**. Run UI on **4200**.
 
 ---
+
+# Project explanation (for your understanding + demo)
+
+MERN is Mongo + Express + React + Node.  
+This is the same idea, but **Angular** instead of React, and **Postgres** instead of Mongo.
+
+```
+Browser (Angular 17 + PrimeNG)
+        HTTP  http://localhost:4200
+              ↓
+Node Express API  http://localhost:3000/api/employees
+              ↓
+PostgreSQL  (you see tables in DBeaver)
+```
+
+**emp-fe** = UI (like React frontend)  
+**emp-api** = REST API (like Express backend)  
+**Postgres** = database (like Mongo, but tables/rows)
+
+## What the app does
+
+Employees page:
+
+- list employees in a table (6 per page)
+- search by name, email, or role
+- filter by department
+- add employee (dialog)
+- edit employee (dialog)
+- delete employee (confirm)
+
+Sidebar Dashboard/Leave/Reports are only layout. Real work is Employees.
+
+## Backend — how to explain `server.js`
+
+Think of it like an Express + Mongoose app, but SQL with `pg`.
+
+| Piece | Meaning |
+| --- | --- |
+| `express` | same as MERN |
+| `cors` | Angular 4200 can call API 3000 |
+| `dotenv` | read `.env` (DB password not in code) |
+| `Pool` | connection to Postgres (like mongoose.connect) |
+| `app.use(express.json())` | parse JSON body |
+
+**SQL vs Mongo:** `pool.query('SELECT ...', [values])` is like `Model.find()`. `$1 $2` are parameters (safe, not string concat for user input).
+
+`cols` uses `to_char(start_date, 'YYYY-MM-DD')` so the date stays `2024-01-12`. If you send a JS Date as JSON it can shift one day (timezone).
+
+### APIs (CRUD)
+
+Same as a MERN employee API:
+
+| Method | URL | What |
+| --- | --- | --- |
+| GET | `/api/employees?search=&department=&page=1&limit=6` | list + search + filter + pagination |
+| GET | `/api/employees/:id` | one row |
+| POST | `/api/employees` | add |
+| PUT | `/api/employees/:id` | update |
+| DELETE | `/api/employees/:id` | delete |
+
+**GET list logic (say this in review):**
+
+1. Read `search`, `department`, `page`, `limit` from query
+2. Build `WHERE` only if search/department is filled
+3. `COUNT(*)` → total rows (paginator needs this)
+4. `SELECT` with `LIMIT` + `OFFSET` → current page
+5. Return `{ data, total, page, limit }`
+
+Search: `ILIKE '%text%'` on name, email, role (case insensitive).
+
+**schema.sql:** `SERIAL` = auto id (like Mongo ObjectId but number). `UNIQUE` on email. Sample INSERTs so the table is not empty.
+
+**DBeaver:** GUI for Postgres (like Mongo Compass). You create DB `emp_manage` and run the SQL.
+
+## Frontend — how to explain Angular (React mapping)
+
+| React | Angular 17 |
+| --- | --- |
+| `App.jsx` | `app.component.ts` + `app.html` |
+| React Router | `app.routes.ts` |
+| `axios` / fetch | `HttpClient` in `employee.service.ts` |
+| `useState` | class fields (`list`, `page`, `showForm`) |
+| `useEffect` | `ngOnInit()` |
+| components folder | `ng g c components/grid` |
+
+**Standalone component** = the component imports what it needs (`TableModule`, `FormsModule`). No big `app.module.ts`.
+
+**PrimeNG** = UI kit (like MUI / Ant Design). `p-table`, `p-dialog`, `p-dropdown`, `p-calendar`, `p-button`.
+
+### File roles
+
+**`app` layout**  
+Blue sidebar + top bar + `<router-outlet>`. Outlet is where the route component renders (like `{children}` / `<Outlet />`).
+
+**`app.routes.ts`**  
+`''` → redirect to `employees`.  
+`employees` → `Grid` component.
+
+**`app.config.ts`**  
+App-wide providers:
+
+- `provideHttpClient()` — API calls
+- `provideRouter()` — routes
+- `provideAnimations()` — PrimeNG dialogs
+- `ConfirmationService` / `MessageService` — delete confirm + toast
+
+**`employee.service.ts`**  
+Only HTTP. Like an `api.js` in MERN. `@Injectable({ providedIn: 'root' })` = one shared service (like a singleton).
+
+**`grid.ts`**  
+Page logic:
+
+- `load()` → GET list
+- `onSearch()` → reset page to 1, load again
+- `onPage()` → PrimeNG page is 0-based, we send `page + 1` to API
+- `openAdd` / `openEdit` → open dialog
+- `save()` → POST or PUT, date formatted `YYYY-MM-DD`
+- `remove()` → confirm then DELETE
+- `initials()` → "Maya Patel" → "MP"
+
+**`grid.html`**  
+Template (like JSX). `[(ngModel)]` is two-way binding (like value + onChange).  
+`*ngIf` / `[class.leave]` = conditional UI.  
+`p-table` `[lazy]="true"` = we fetch from API on page change, not all rows in browser.
+
+**`grid.css` / `app.css`**  
+Layout and table look (sidebar blue, status pills).
+
+## One request flow (say this)
+
+User types in search → `onSearch()` → `EmployeeService.list()` →  
+`GET /api/employees?search=maya&page=1&limit=6` →  
+Postgres `WHERE full_name ILIKE '%maya%'` →  
+JSON `{ data, total }` → table updates.
+
+Add: form → `save()` → `POST /api/employees` → `INSERT` → `load()` again.
+
+## How to run (demo)
+
+1. Postgres running, DBeaver DB `emp_manage` created, `schema.sql` run  
+2. `cd emp-api` → `node server.js` → port 3000  
+3. `cd emp-fe` → `ng serve` → port 4200  
+4. Browser `http://localhost:4200`
+
+If table is empty: API not running, or CORS, or wrong `.env` password.
+
+## Why `ng g c components/grid`
+
+Lead wants CLI-generated folders:
+
+```
+src/app/components/grid/grid.ts
+                         grid.html
+                         grid.css
+                         grid.spec.ts
+```
+
+`--type=""` makes `grid.ts` not `grid.component.ts`.
+
+---
+
 
 # A) Backend — emp-api (Node + Postgres)
 
