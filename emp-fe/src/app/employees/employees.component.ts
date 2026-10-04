@@ -1,36 +1,14 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { TableModule } from 'primeng/table';
-import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { DropdownModule } from 'primeng/dropdown';
-import { DialogModule } from 'primeng/dialog';
-import { CalendarModule } from 'primeng/calendar';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ToastModule } from 'primeng/toast';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { Employee, EmployeeService } from '../../employee.service';
+import { Employee, EmployeeService } from '../employee.service';
 
 @Component({
-  selector: 'app-grid',
-  standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    TableModule,
-    ButtonModule,
-    InputTextModule,
-    DropdownModule,
-    DialogModule,
-    CalendarModule,
-    ConfirmDialogModule,
-    ToastModule
-  ],
-  templateUrl: './grid.html',
-  styleUrl: './grid.css'
+  selector: 'app-employees',
+  standalone: false,
+  templateUrl: './employees.component.html',
+  styleUrls: ['./employees.component.css']
 })
-export class Grid implements OnInit {
+export class EmployeesComponent implements OnInit {
   list: Employee[] = [];
   total = 0;
   page = 1;
