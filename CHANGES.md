@@ -149,4 +149,6 @@ npm install
 npm start
 ```
 
-**Say to lead:** entity = table shape. service = findAll/create/update/delete SQL. controller = req/res.
+Swagger: `http://localhost:3000/swagger`
+
+**Say to lead:** entity = table shape. service = findAll/create/update/delete SQL. controller = req/res. Swagger like tcp-app API docs.
