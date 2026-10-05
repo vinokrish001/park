@@ -121,3 +121,32 @@ ng serve
 ```
 
 Open `/employees`. Table must still work. Click sidebar Dashboard → `/dashboard`.
+
+---
+
+## 6. Backend folder (lead: no SQL in model)
+
+Same idea as `tcp-app` `apps/api/src/modules/feature-flags/`:
+
+```
+emp-api/src/
+  main.ts
+  database/database.ts
+  modules/employees/
+    employee.module.ts
+    employee.controller.ts     HTTP only
+    employee.service.ts        DB queries live here
+    entities/employee.entity.ts   columns only, NO SQL
+    dto/create-employee.dto.ts
+    dto/update-employee.dto.ts
+```
+
+Delete old `server.js`. URLs stay `/api/employees`.
+
+```bash
+cd emp-api
+npm install
+npm start
+```
+
+**Say to lead:** entity = table shape. service = findAll/create/update/delete SQL. controller = req/res.
